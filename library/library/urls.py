@@ -1,4 +1,4 @@
-"""notes URL Configuration
+"""library URL Configuration
 
 The `urlpatterns` list routes URLs to views. For more information please see:
     https://docs.djangoproject.com/en/4.1/topics/http/urls/
@@ -17,14 +17,14 @@ from django.contrib import admin
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 
-from webnotes.views import AuthorModelViewSet
+from authors.views import AuthorModelViewSet
 
 router = DefaultRouter()
 router.register('authors', AuthorModelViewSet)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('webnotes/', include(router.urls)),
+    path('authors/', include(router.urls)),
     path('api-auth/', include('rest_framework.urls'))
 ]
 
