@@ -3,4 +3,4 @@ from django.apps import AppConfig
 
 class WebnotesConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
-    name = 'webnotes'
+    name = 'authors'
