@@ -1,63 +1,52 @@
-from rest_framework.renderers import JSONRenderer
+from rest_framework import viewsets
+from rest_framework.pagination import LimitOffsetPagination
+from rest_framework.renderers import JSONRenderer, BrowsableAPIRenderer
 from rest_framework.viewsets import ModelViewSet
-from rest_framework.generics import CreateAPIView, ListAPIView
+from rest_framework.generics import CreateAPIView, ListAPIView, UpdateAPIView, get_object_or_404
 from rest_framework.response import Response
 from .models import Project, ToDo, User  # Author, Biograthy, Book, Article,
 from .serializers import ProjectModelSerializer, ToDoModelSerializer, UserModelSerializer \
- # AuthorModelSerializer, BookModelSerializer, BiograthyModelSerializer, ArticleModelSerializer,
+    # AuthorModelSerializer, BookModelSerializer, BiograthyModelSerializer, ArticleModelSerializer,
+
+# Собственные классы пагинации
 
 
-class UserModelViewSet(ModelViewSet):
-    queryset = User.objects.all()
-    serializer_class = UserModelSerializer
+class ProjectPagination(LimitOffsetPagination):
+    default_limit = 10
 
 
-class ProjectModelViewSet(ModelViewSet):
-    queryset = Project.objects.all()
+class ToDoPagination(LimitOffsetPagination):
+    default_limit = 20
+
+
+class UserModelViewSet(viewsets.ViewSet):
+    # renderer_classes = [JSONRenderer]
+
+    def list(self, request):
+        users = User.objects.all()
+        serializer = UserModelSerializer(users, many=True)
+        return Response(serializer.data)
+
+    def retrieve(self, request, pk=None):
+        user = get_object_or_404(User, pk=pk)
+        serializer = UserModelSerializer(user, many=True)
+        return Response(serializer.data)
+
+    def update(self, request, pk=None):
+        pass
+
+
+class ProjectFilterViewSet(ModelViewSet):
     serializer_class = ProjectModelSerializer
+    renderer_classes = [JSONRenderer, BrowsableAPIRenderer]
+    queryset = Project.objects.all()
+
+    def get_queryset(self):
+        return Project.objects.filter(name__contains='name')
 
 
 class ToDoModelViewSet(ModelViewSet):
     queryset = ToDo.objects.all()
     serializer_class = ToDoModelSerializer
-
-
-"""
-class AuthorModelViewSet(ModelViewSet):
-    queryset = Author.objects.all()
-    serializer_class = AuthorModelSerializer
-
-class BiograthyModelViewSet(ModelViewSet):
-    queryset = Biograthy.objects.all()
-    serializer_class = BiograthyModelSerializer
-
-
-class BookModelViewSet(ModelViewSet):
-    queryset = Book.objects.all()
-    serializer_class = BookModelSerializer
-
-
-class ArticleModelViewSet(ModelViewSet):
-    queryset = Article.objects.all()
-    serializer_class = ArticleModelSerializer
-
-class MyAPIView(CreateAPIView, ListAPIView):
-    render_classes = [JSONRenderer]
-    queryset = Author.objects.all()
-    serializer_class = AuthorModelSerializer
-
-
-###
-class AllProjects(CreateAPIView, ListAPIView):
-    queryset = Project.objects.all()
-    serializer_class = ProjectModelSerializer
-
-
-class AllTasks(CreateAPIView, ListAPIView):
-    queryset = ToDo.objects.all()
-    serializer_class = ToDoModelSerializer
-
-
-"""
-
-
+    pagination_class = ToDoPagination
+    filter_fields = ['project']
