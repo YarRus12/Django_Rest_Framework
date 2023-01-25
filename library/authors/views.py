@@ -1,5 +1,6 @@
 from rest_framework import viewsets
 from rest_framework.pagination import LimitOffsetPagination
+from rest_framework.permissions import AllowAny, DjangoModelPermissionsOrAnonReadOnly
 from rest_framework.renderers import JSONRenderer, BrowsableAPIRenderer
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.generics import CreateAPIView, ListAPIView, UpdateAPIView, get_object_or_404
@@ -43,6 +44,12 @@ class ProjectFilterViewSet(ModelViewSet):
 
     def get_queryset(self):
         return Project.objects.filter(name__contains='name')
+
+
+class ProjectModelViewSet(ModelViewSet):
+    permission_classes = [AllowAny]
+    queryset = Project.objects.all()
+    serializer_class = ProjectModelSerializer
 
 
 class ToDoModelViewSet(ModelViewSet):
