@@ -1,6 +1,6 @@
 from rest_framework import viewsets
 from rest_framework.pagination import LimitOffsetPagination
-from rest_framework.permissions import AllowAny, DjangoModelPermissionsOrAnonReadOnly
+from rest_framework.permissions import AllowAny, DjangoModelPermissionsOrAnonReadOnly, IsAuthenticated
 from rest_framework.renderers import JSONRenderer, BrowsableAPIRenderer
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.generics import CreateAPIView, ListAPIView, UpdateAPIView, get_object_or_404
@@ -12,6 +12,10 @@ from .serializers import ProjectModelSerializer, ToDoModelSerializer, UserModelS
 # Собственные классы пагинации
 
 
+class UserPagination(LimitOffsetPagination):
+    default_limit = 3
+
+
 class ProjectPagination(LimitOffsetPagination):
     default_limit = 10
 
@@ -20,8 +24,13 @@ class ToDoPagination(LimitOffsetPagination):
     default_limit = 20
 
 
-class UserModelViewSet(viewsets.ViewSet):
+class UserModelViewSet(ModelViewSet):
     # renderer_classes = [JSONRenderer]
+    queryset = User.objecnts.all()
+    permission_classes = [IsAuthenticated]
+    serializer_class = UserModelSerializer
+    filterset_fields = ['first_name', 'last_name', 'birthday_year']
+    pagination_class = UserPagination
 
     def list(self, request):
         users = User.objects.all()
